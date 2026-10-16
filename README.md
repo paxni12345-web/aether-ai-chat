@@ -1,15 +1,12 @@
 # Aether — Premium AI Chat Interface
 
-A modern, polished AI chat web application built with React, TypeScript, and Tailwind CSS.
+Modern AI chat UI built with React, TypeScript, and Tailwind CSS.
 
-## Features
+## Live demo
 
-- **Full conversation management** — create, rename, delete, search
-- **Persistent history** — localStorage restores chats after refresh
-- **Streaming demo responses** — realistic typing simulation
-- **Responsive design** — desktop sidebar, mobile drawer
-- **Accessibility** — keyboard navigation, focus rings, ARIA labels
-- **Ready for real AI** — clean service layer for API integration
+**https://paxni12345-web.github.io/aether-ai-chat/**
+
+(After GitHub Pages is enabled and the deploy workflow finishes.)
 
 ## Quick start
 
@@ -20,30 +17,33 @@ npm run dev
 
 Open http://localhost:5173
 
+## Build static site
+
+```bash
+npm install
+npm run build
+```
+
+Output is in `dist/` — ready for any static host (GitHub Pages, Netlify, Vercel, etc.).
+
 ## Tech stack
 
 - React 19 + TypeScript
 - Vite 6
 - Tailwind CSS 4
 - Lucide icons
-- uuid
+- localStorage persistence
+- Demo streaming responses (no external AI API)
 
-## Demo mode
+## Deploy (GitHub Pages)
 
-No external AI API is connected. Responses are generated locally by `src/services/aiService.ts`.
+This repo includes `.github/workflows/deploy.yml`.
 
-To connect a real model, replace `generateDemoResponse` with your preferred provider (OpenAI, Anthropic, etc.).
+1. Repo → **Settings** → **Pages**
+2. Source: **GitHub Actions**
+3. Push to `main` (or run the workflow manually)
 
-## Project structure
-
-```
-src/
-  components/   # UI components
-  hooks/        # useChat state management
-  services/     # AI service (demo + future API)
-  lib/          # storage, utils
-  types/        # TypeScript types
-```
+Site URL: `https://paxni12345-web.github.io/aether-ai-chat/`
 
 ## License
 
