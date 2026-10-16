@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type KeyboardEvent } from 'react';
 import { Send, Paperclip, Square, Wrench } from 'lucide-react';
 
 interface Props {
@@ -28,7 +28,7 @@ export function MessageComposer({ onSend, onStop, isGenerating, disabled }: Prop
     onSend(text);
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
+  const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSend();
