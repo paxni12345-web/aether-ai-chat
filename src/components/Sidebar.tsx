@@ -48,14 +48,11 @@ export function Sidebar({
 
   const content = (
     <div
-      className>{`flex h-full flex-col border-r border-[var(--color-border)] bg-[var(--color-sidebar)] transition-all duration-200 ${
+      className={`flex h-full flex-col border-r border-[var(--color-border)] bg-[var(--color-sidebar)] transition-all duration-200 ${
         collapsed ? 'w-[60px]' : 'w-[260px]'
       }`}
     >
-      {/* Header */}
-      <div
-        className={`flex items-center gap-2 border-b border-[var(--color-border)] px-3 py-3 ${collapsed ? 'justify-center' : ''}}
-      >
+      <div className={`flex items-center gap-2 border-b border-[var(--color-border)] px-3 py-3 ${collapsed ? 'justify-center' : ''}`}>
         {!collapsed && (
           <div className="flex items-center gap-2 flex-1 min-w-0">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--color-primary)] text-white">
@@ -70,7 +67,7 @@ export function Sidebar({
           className="hidden md:flex h-8 w-8 items-center justify-center rounded-lg text-[var(--color-muted)] hover:bg-[var(--color-border-subtle)] hover:text-[var(--color-foreground)] transition-colors"
           aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >
-          {collapsed ? <PanelLeft className="h-4 w+t4" /> : <PanelLeftClose className="h-4 w+t4" />}
+          {collapsed ? <PanelLeft className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
         </button>
         <button
           type="button"
@@ -82,7 +79,6 @@ export function Sidebar({
         </button>
       </div>
 
-      {/* New chat */}
       <div className={`px-3 pt-3 ${collapsed ? 'px-2' : ''}`}>
         <button
           type="button"
@@ -100,11 +96,10 @@ export function Sidebar({
         </button>
       </div>
 
-      {/* Search */}
       {!collapsed && (
         <div className="px-3 pt-3">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 h-3.5 w+s.5 translate-y-1/2 text-[var(--color-muted)]" />
+            <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-[var(--color-muted)]" />
             <input
               type="search"
               value={search}
@@ -117,7 +112,6 @@ export function Sidebar({
         </div>
       )}
 
-      {/* List */}
       <div className="mt-2 flex-1 overflow-hidden">
         <ConversationList
           conversations={conversations}
@@ -130,8 +124,7 @@ export function Sidebar({
         />
       </div>
 
-      {/* Footer */}
-      <div className={`border-t border-[var(--color-border)] p-3 ${collapsed ? 'flex flex-col items-center gap-1' : ''}}>
+      <div className={`border-t border-[var(--color-border)] p-3 ${collapsed ? 'flex flex-col items-center gap-1' : ''}`}>
         <button
           type="button"
           onClick={onOpenSettings}
@@ -159,10 +152,8 @@ export function Sidebar({
 
   return (
     <>
-      {/* Desktop */}
       <aside className="hidden md:flex h-full shrink-0">{content}</aside>
 
-      {/* Mobile drawer */}
       {mobileOpen && (
         <div className="fixed inset-0 z-40 md:hidden">
           <div className="absolute inset-0 bg-black/40" onClick={onCloseMobile} aria-hidden />
