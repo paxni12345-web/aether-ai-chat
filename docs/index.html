@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#09090b" />
+  <title>Aether — AI Chat (Static Demo)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root{--surface:#fafafa;--elevated:#fff;--sidebar:#f4f4f5;--border:#e4e4e7;--border-subtle:#f4f4f5;--muted:#71717a;--fg:#18181b;--primary:#6366f1;--primary-hover:#4f46e5;--primary-muted:#eef2ff}
+    @media(prefers-color-scheme:dark){:root{--surface:#09090b;--elevated:#18181b;--sidebar:#0f0f11;--border:#27272a;--border-subtle:#1c1c1f;--muted:#a1a1aa;--fg:#fafafa;--primary:#818cf8;--primary-hover:#a5b4fc;--primary-muted:#1e1b4b}}
+    *{box-sizing:border-box;margin:0;padding:0}html,body{height:100%}body{font-family:Inter,system-ui,sans-serif;background:var(--surface);color:var(--fg);-webkit-font-smoothing:antialiased}
+    #app{display:flex;height:100%;overflow:hidden}
+    .sidebar{width:260px;flex-shrink:0;display:flex;flex-direction:column;background:var(--sidebar);border-right:1px solid var(--border)}
+    .sidebar-header{display:flex;align-items:center;gap:8px;padding:12px;border-bottom:1px solid var(--border)}
+    .logo{width:32px;height:32px;border-radius:8px;background:var(--primary);display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px}
+    .logo-text{font-weight:600;font-size:14px}
+    .btn-new{margin:12px;height:40px;border:none;border-radius:12px;background:var(--primary);color:#fff;font-weight:500;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px}
+    .btn-new:hover{background:var(--primary-hover)}
+    .search-wrap{padding:0 12px 8px;position:relative}
+    .search-wrap input{width:100%;padding:8px 12px 8px 36px;border-radius:8px;border:1px solid var(--border);background:var(--elevated);color:var(--fg);font-size:14px;outline:none}
+    .search-wrap svg{position:absolute;left:24px;top:50%;transform:translateY(-50%);color:var(--muted)}
+    .conv-list{flex:1;overflow-y:auto;padding:0 8px 8px}
+    .group-label{padding:6px 8px;font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+    .conv-item{display:flex;align-items:center;width:100%;padding:8px 12px;border:none;border-radius:8px;background:transparent;color:var(--fg);font-size:14px;text-align:left;cursor:pointer;margin-bottom:2px}
+    .conv-item:hover{background:var(--border-subtle)}.conv-item.active{background:var(--border);font-weight:500}
+    .conv-item span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .sidebar-footer{border-top:1px solid var(--border);padding:12px;font-size:13px;color:var(--muted)}
+    .main{flex:1;display:flex;flex-direction:column;min-width:0}
+    .header{height:56px;display:flex;align-items:center;gap:12px;padding:0 16px;border-bottom:1px solid var(--border);background:var(--surface)}
+    .header h1{flex:1;font-size:14px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .header select{appearance:none;padding:6px 28px 6px 12px;border-radius:8px;border:1px solid var(--border);background:var(--elevated);color:var(--fg);font-size:13px;cursor:pointer}
+    .menu-btn{display:none;width:36px;height:36px;border:none;border-radius:8px;background:transparent;color:var(--muted);cursor:pointer;font-size:18px}
+    .messages{flex:1;overflow-y:auto}
+    .messages-inner{max-width:768px;margin:0 auto;padding:24px 16px;display:flex;flex-direction:column;gap:24px}
+    .msg-user{display:flex;justify-content:flex-end}
+    .msg-user .bubble{max-width:75%;padding:10px 16px;border-radius:16px 16px 4px 16px;background:var(--primary);color:#fff;font-size:15px;line-height:1.6;white-space:pre-wrap;word-break:break-word}
+    .msg-assistant{display:flex;gap:12px}
+    .avatar{width:28px;height:28px;border-radius:8px;background:var(--primary-muted);color:var(--primary);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px;margin-top:2px}
+    .msg-body{flex:1;min-width:0;font-size:15px;line-height:1.6}
+    .msg-body p{margin:.5em 0}.msg-body p:first-child{margin-top:0}
+    .msg-body ul,.msg-body ol{margin:.5em 0;padding-left:1.5em}
+    .msg-body code{font-family:ui-monospace,Menlo,monospace;font-size:.875em;background:var(--border-subtle);padding:.15em .35em;border-radius:4px}
+    .msg-body pre{background:#1e1e2e;color:#cdd6f4;padding:1rem;border-radius:8px;overflow-x:auto;margin:.75em 0;font-size:.875rem}
+    .msg-body pre code{background:none;padding:0;color:inherit}
+    .actions{display:flex;gap:2px;margin-top:8px}
+    .actions button{width:32px;height:32px;border:none;border-radius:8px;background:transparent;color:var(--muted);cursor:pointer;font-size:14px}
+    .actions button:hover{background:var(--border-subtle);color:var(--fg)}
+    .empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 16px;text-align:center}
+    .empty-icon{width:56px;height:56px;border-radius:16px;background:var(--primary-muted);color:var(--primary);display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:20px}
+    .empty h2{font-size:22px;font-weight:600;margin-bottom:8px}
+    .empty p{font-size:14px;color:var(--muted);max-width:400px;margin-bottom:32px}
+    .suggestions{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:560px;width:100%}
+    .suggestion{padding:16px;border-radius:12px;border:1px solid var(--border);background:var(--elevated);text-align:left;cursor:pointer;font-size:14px;color:var(--fg)}
+    .suggestion:hover{border-color:color-mix(in srgb,var(--primary) 40%,transparent);box-shadow:0 1px 3px rgba(0,0,0,.06)}
+    .composer-wrap{border-top:1px solid var(--border);padding:12px 16px;background:var(--surface)}
+    .composer-inner{max-width:768px;margin:0 auto}
+    .composer{display:flex;align-items:flex-end;gap:8px;padding:8px 12px;border-radius:16px;border:1px solid var(--border);background:var(--elevated)}
+    .composer:focus-within{border-color:color-mix(in srgb,var(--primary) 50%,transparent);box-shadow:0 0 0 3px color-mix(in srgb,var(--primary) 15%,transparent)}
+    .composer textarea{flex:1;border:none;background:transparent;color:var(--fg);font-size:15px;font-family:inherit;resize:none;outline:none;max-height:160px;min-height:36px;padding:8px 0;line-height:1.5}
+    .composer .send{width:36px;height:36px;border:none;border-radius:8px;background:var(--primary);color:#fff;cursor:pointer;flex-shrink:0;margin-bottom:2px;font-size:16px}
+    .composer .send:disabled{opacity:.35;cursor:not-allowed}
+    .composer .stop{width:36px;height:36px;border:none;border-radius:8px;background:var(--fg);color:var(--surface);cursor:pointer;flex-shrink:0;margin-bottom:2px;display:none}
+    .hint{text-align:center;font-size:11px;color:var(--muted);margin-top:8px}
+    .typing{display:flex;gap:4px;padding:8px 0}
+    .typing span{width:6px;height:6px;border-radius:50%;background:var(--muted);animation:bounce 1.2s infinite ease-in-out}
+    .typing span:nth-child(2){animation-delay:.15s}.typing span:nth-child(3){animation-delay:.3s}
+    @keyframes bounce{0%,80%,100%{transform:translateY(0);opacity:.4}40%{transform:translateY(-4px);opacity:1}}
+    .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:40}.overlay.open{display:block}
+    @media(max-width:768px){.sidebar{position:fixed;left:0;top:0;bottom:0;z-index:50;transform:translateX(-100%);transition:transform .2s}.sidebar.open{transform:translateX(0)}.menu-btn{display:flex;align-items:center;justify-content:center}.suggestions{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<div id="app">
+  <div class="overlay" id="overlay"></div>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header"><div class="logo">✦</div><span class="logo-text">Aether</span></div>
+    <button class="btn-new" id="btnNew">+ New chat</button>
+    <div class="search-wrap">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      <input type="search" id="search" placeholder="Search conversations..." />
+    </div>
+    <div class="conv-list" id="convList"></div>
+    <div class="sidebar-footer">Demo mode · localStorage</div>
+  </aside>
+  <main class="main">
+    <header class="header">
+      <button class="menu-btn" id="menuBtn" aria-label="Menu">☰</button>
+      <h1 id="title">New conversation</h1>
+      <select id="model"><option>Aether Demo</option><option>Aether Fast</option><option>Aether Think</option></select>
+    </header>
+    <div class="messages" id="messages">
+      <div class="empty" id="empty">
+        <div class="empty-icon">✦</div>
+        <h2>What would you like to explore?</h2>
+        <p>Ask anything — explanations, writing help, ideas, or analysis. Responses are generated in demo mode.</p>
+        <div class="suggestions">
+          <button class="suggestion" data-prompt="Help me understand a difficult topic.">📖 Help me understand a difficult topic.</button>
+          <button class="suggestion" data-prompt="Write and improve my content.">✏️ Write and improve my content.</button>
+          <button class="suggestion" data-prompt="Generate ideas for a project.">💡 Generate ideas for a project.</button>
+          <button class="suggestion" data-prompt="Analyze information and summarize key points.">📊 Analyze information and summarize key points.</button>
+        </div>
+      </div>
+      <div class="messages-inner" id="msgList" style="display:none"></div>
+    </div>
+    <div class="composer-wrap">
+      <div class="composer-inner">
+        <div class="composer">
+          <textarea id="input" rows="1" placeholder="Ask anything..."></textarea>
+          <button class="send" id="btnSend" disabled>➤</button>
+          <button class="stop" id="btnStop">■</button>
+        </div>
+        <p class="hint">Enter to send · Shift+Enter for new line · Demo mode</p>
+      </div>
+    </div>
+  </main>
+</div>
+<script>
+const STORAGE_KEY='aether_static_v1';
+const RESPONSES={
+default:`Here's a thoughtful response to your question.\n\nI can help with a wide range of tasks:\n\n- **Explain** complex topics in plain language\n- **Write & improve** content, emails, or documentation\n- **Brainstorm** ideas and structure projects\n- **Analyze** information and extract key insights\n\nFeel free to ask follow-up questions or refine what you need.`,
+code:`Here's a clean TypeScript example:\n\n\`\`\`typescript\ninterface User {\n  id: string;\n  name: string;\n  email: string;\n}\n\nasync function fetchUser(id: string): Promise<User> {\n  const res = await fetch(\`/api/users/\${id}\`);\n  if (!res.ok) throw new Error('User not found');\n  return res.json();\n}\n\`\`\`\n\nKey points:\n1. Strong typing prevents common runtime errors\n2. Explicit error handling makes failures visible\n3. Async/await keeps the flow readable`,
+ideas:`Here are several directions you could explore:\n\n1. **Simplify the onboarding flow** — reduce friction in the first 60 seconds\n2. **Add progressive disclosure** — show advanced options only when needed\n3. **Instrument key actions** — measure where users drop off\n4. **Ship a minimal viable loop** — get feedback before expanding scope\n\nWhich of these resonates most with your current priorities?`,
+summarize:`**Summary of key points:**\n\n1. The main idea centers on clarity and structure.\n2. Supporting details reinforce the core argument.\n3. Practical next steps emerge from the analysis.\n\nWould you like me to expand on any of these points?`
+};
+function pickResponse(p){const l=p.toLowerCase();if(/code|function|typescript|react/.test(l))return RESPONSES.code;if(/idea|brainstorm|project/.test(l))return RESPONSES.ideas;if(/summar|analy|key point/.test(l))return RESPONSES.summarize;return RESPONSES.default}
+function uid(){return crypto.randomUUID()}
+function md(t){let h=t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');h=h.replace(/```\\w*\\n([\\s\\S]*?)```/g,(_,c)=>'<pre><code>'+c.trim()+'</code></pre>');h=h.replace(/`([^`]+)`/g,'<code>$1</code>');h=h.replace(/\\*\\*([^*]+)\\*\\*/g,'<strong>$1</strong>');h=h.replace(/^- (.+)$/gm,'<li>$1</li>');h=h.replace(/(<li>.*<\\/li>\\n?)+/g,m=>'<ul>'+m+'</ul>');h=h.replace(/^\\d+\\. (.+)$/gm,'<li>$1</li>');return h.split(/\\n\\n+/).map(p=>{if(p.startsWith('<pre')||p.startsWith('<ul'))return p;return '<p>'+p.replace(/\\n/g,'<br/>')+'</p>'}).join('')}
+let state={conversations:[],activeId:null,generating:false,abort:null};
+function load(){try{const r=localStorage.getItem(STORAGE_KEY);if(r)state={...state,...JSON.parse(r),generating:false,abort:null}}catch{}}
+function save(){localStorage.setItem(STORAGE_KEY,JSON.stringify({conversations:state.conversations,activeId:state.activeId}))}
+function active(){return state.conversations.find(c=>c.id===state.activeId)||null}
+function escapeHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function renderList(){const q=document.getElementById('search').value.trim().toLowerCase();let items=state.conversations;if(q)items=items.filter(c=>c.title.toLowerCase().includes(q));const el=document.getElementById('convList');if(!items.length){el.innerHTML='<div style="padding:24px 12px;text-align:center;font-size:13px;color:var(--muted)">'+(q?'No conversations found':'No conversations yet')+'</div>';return}el.innerHTML='<div class="group-label">Conversations</div>'+items.map(c=>'<button class="conv-item'+(c.id===state.activeId?' active':'')+'" data-id="'+c.id+'"><span>'+escapeHtml(c.title)+'</span></button>').join('');el.querySelectorAll('.conv-item').forEach(btn=>{btn.onclick=()=>{state.activeId=btn.dataset.id;save();render();closeSidebar()}})}
+function renderMessages(){const conv=active();const empty=document.getElementById('empty');const list=document.getElementById('msgList');const title=document.getElementById('title');if(!conv||!conv.messages.length){empty.style.display='flex';list.style.display='none';title.textContent=conv?conv.title:'New conversation';return}empty.style.display='none';list.style.display='flex';title.textContent=conv.title;list.innerHTML=conv.messages.map(m=>{if(m.role==='user')return'<div class="msg-user"><div class="bubble">'+escapeHtml(m.content)+'</div></div>';let body='';if(m.status==='streaming'&&!m.content)body='<div class="typing"><span></span><span></span><span></span></div>';else{body='<div class="msg-body">'+md(m.content||'')+'</div>';if(m.status==='complete'||m.status==='stopped')body+='<div class="actions"><button data-copy="'+m.id+'" title="Copy">📋</button></div>'}return'<div class="msg-assistant"><div class="avatar">✦</div><div style="flex:1">'+body+'</div></div>'}).join('');list.querySelectorAll('[data-copy]').forEach(btn=>{btn.onclick=()=>{const msg=conv.messages.find(m=>m.id===btn.dataset.copy);if(msg)navigator.clipboard.writeText(msg.content)}});list.parentElement.scrollTop=list.parentElement.scrollHeight}
+function render(){renderList();renderMessages();const send=document.getElementById('btnSend');const stop=document.getElementById('btnStop');send.style.display=state.generating?'none':'block';stop.style.display=state.generating?'block':'none';updateSend()}
+function updateSend(){const v=document.getElementById('input').value.trim();document.getElementById('btnSend').disabled=!v||state.generating}
+function newChat(){const now=Date.now();const conv={id:uid(),title:'New conversation',messages:[],createdAt:now,updatedAt:now};state.conversations.unshift(conv);state.activeId=conv.id;save();render();closeSidebar()}
+async function sendMessage(text){text=text.trim();if(!text||state.generating)return;let conv=active();if(!conv){newChat();conv=active()}const userMsg={id:uid(),role:'user',content:text,status:'complete',createdAt:Date.now()};const asstMsg={id:uid(),role:'assistant',content:'',status:'streaming',createdAt:Date.now()};if(!conv.messages.length)conv.title=text.length>48?text.slice(0,48)+'…':text;conv.messages.push(userMsg,asstMsg);conv.updatedAt=Date.now();document.getElementById('input').value='';state.generating=true;const ac=new AbortController();state.abort=ac;save();render();const full=pickResponse(text);const words=full.split(/(\s+)/);let acc='';try{for(const w of words){if(ac.signal.aborted)throw new DOMException('stopped','AbortError');acc+=w;asstMsg.content=acc;renderMessages();await new Promise(r=>setTimeout(r,w.trim()?18+Math.random()*28:8))}asstMsg.status='complete'}catch(e){asstMsg.status=e.name==='AbortError'?'stopped':'error';if(!asstMsg.content)asstMsg.content='Generation stopped.'}state.generating=false;state.abort=null;conv.updatedAt=Date.now();save();render()}
+function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('overlay').classList.remove('open')}
+document.getElementById('btnNew').onclick=newChat;
+document.getElementById('search').oninput=renderList;
+document.getElementById('input').oninput=function(){updateSend();this.style.height='auto';this.style.height=Math.min(this.scrollHeight,160)+'px'};
+document.getElementById('input').onkeydown=function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage(this.value)}};
+document.getElementById('btnSend').onclick=()=>sendMessage(document.getElementById('input').value);
+document.getElementById('btnStop').onclick=()=>state.abort&&state.abort.abort();
+document.getElementById('menuBtn').onclick=()=>{document.getElementById('sidebar').classList.add('open');document.getElementById('overlay').classList.add('open')};
+document.getElementById('overlay').onclick=closeSidebar;
+document.querySelectorAll('.suggestion').forEach(btn=>{btn.onclick=()=>sendMessage(btn.dataset.prompt)});
+load();if(state.conversations.length&&!state.activeId)state.activeId=state.conversations[0].id;render();
+</script>
+</body>
+</html>
